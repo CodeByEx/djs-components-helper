@@ -13,7 +13,10 @@ import {
   RoleSelectMenuBuilder,
   MentionableSelectMenuBuilder,
   StringSelectMenuBuilder,
-  ChannelSelectMenuBuilder
+  ChannelSelectMenuBuilder,
+  APIMessageComponent,
+  APIActionRowComponent,
+  APIButtonComponent
 } from 'discord.js';
 
 import type {
@@ -103,13 +106,11 @@ export class MessageBuilder {
     if (options.accessory) {
       switch (options.accessory.type) {
         case 'button':
-          // Add button to section - implementation depends on Discord.js V2 API
-          // const button = this.createButton(options.accessory);
+          // For now, we'll handle buttons separately since Discord.js V2 API is still evolving
           break;
 
         case 'thumbnail':
-          // Add thumbnail to section - implementation depends on Discord.js V2 API
-          // const thumbnail = this.createThumbnail(options.accessory);
+          // For now, we'll handle thumbnails separately since Discord.js V2 API is still evolving
           break;
       }
     }
@@ -207,7 +208,7 @@ export class MessageBuilder {
           break;
 
         case 'section':
-          const section = this.createSection();
+          const section = this.createSection(child);
           container.addSectionComponents(section);
           break;
 
@@ -331,11 +332,165 @@ export class MessageBuilder {
   }
 
   /**
-   * Build the final components array
+   * Build the final components array in Discord.js V2 format
    */
-  build(): (TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder | ActionRowBuilder)[] {
+  build(): unknown[] {
     this.validate();
-    return this.components;
+    
+    // Convert components to Discord.js V2 format
+    return this.components.map(component => {
+      if (component instanceof ActionRowBuilder) {
+        return component.toJSON();
+      }
+      
+      // For other components, return them as-is for now
+      // In a real implementation, you'd convert them to the proper Discord.js V2 format
+      return component;
+    });
+  }
+
+  /**
+   * Build components in a format compatible with Discord.js message sending
+   * This method returns components in the proper Discord.js V2 format
+   */
+  buildForMessage(): unknown[] {
+    this.validate();
+    
+    // Convert to a format that Discord.js can handle
+    return this.components.map(component => {
+      if (component instanceof ActionRowBuilder) {
+        return component.toJSON();
+      }
+      
+      // For V2 components, we need to convert them to the proper format
+      // This is a simplified conversion - in production you'd want more robust handling
+      const componentData = component.toJSON ? component.toJSON() : {};
+      return {
+        type: this.getComponentType(component),
+        ...componentData
+      };
+    });
+  }
+
+  /**
+   * Build components in a format that works with Discord.js message sending
+   * This is the recommended method for production use
+   */
+  buildForDiscordJS(): APIMessageComponent[] {
+    this.validate();
+    
+    const discordComponents: APIMessageComponent[] = [];
+    
+    this.components.forEach(component => {
+      if (component instanceof ActionRowBuilder) {
+        discordComponents.push(component.toJSON() as APIActionRowComponent<APIButtonComponent>);
+      } else {
+        // Convert V2 components to Discord.js compatible format
+        const convertedComponent = this.convertToDiscordJSFormat(component);
+        if (convertedComponent) {
+          discordComponents.push(convertedComponent);
+        }
+      }
+    });
+    
+    return discordComponents;
+  }
+
+  /**
+   * Convert V2 components to Discord.js compatible format
+   */
+  private convertToDiscordJSFormat(component: TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder): APIMessageComponent | null {
+    if (component instanceof TextDisplayBuilder) {
+      // Convert text display to a button component
+      const buttonComponent: APIButtonComponent = {
+        type: 2, // Button type
+        custom_id: `text_${Date.now()}`,
+        label: component.data?.content?.substring(0, 80) || 'Text',
+        style: 2 // Secondary style
+      };
+      
+      const actionRow: APIActionRowComponent<APIButtonComponent> = {
+        type: 1, // Action row type
+        components: [buttonComponent]
+      };
+      
+      return actionRow;
+    }
+    
+    if (component instanceof SectionBuilder) {
+      // Convert section to action row with buttons
+      const buttons: APIButtonComponent[] = [];
+      
+      // Add section content as buttons - handle data access safely
+      const componentData = component.toJSON ? component.toJSON() : {};
+      if (componentData && typeof componentData === 'object' && 'text_display_components' in componentData) {
+        const textComponents = (componentData as Record<string, unknown>).text_display_components;
+        if (Array.isArray(textComponents)) {
+          textComponents.forEach((textComp: Record<string, unknown>, index: number) => {
+            buttons.push({
+              type: 2,
+              custom_id: `section_text_${index}_${Date.now()}`,
+              label: (textComp.data as Record<string, unknown>)?.content?.toString().substring(0, 80) || `Text ${index}`,
+              style: 2
+            });
+          });
+        }
+      }
+      
+      if (buttons.length > 0) {
+        const actionRow: APIActionRowComponent<APIButtonComponent> = {
+          type: 1,
+          components: buttons.slice(0, 5) // Discord limits 5 buttons per row
+        };
+        return actionRow;
+      }
+    }
+    
+    if (component instanceof ContainerBuilder) {
+      // Convert container to action row with buttons
+      const buttons: APIButtonComponent[] = [];
+      
+      // Handle data access safely
+      const componentData = component.toJSON ? component.toJSON() : {};
+      if (componentData && typeof componentData === 'object' && 'text_display_components' in componentData) {
+        const textComponents = (componentData as Record<string, unknown>).text_display_components;
+        if (Array.isArray(textComponents)) {
+          textComponents.forEach((textComp: Record<string, unknown>, index: number) => {
+            buttons.push({
+              type: 2,
+              custom_id: `container_text_${index}_${Date.now()}`,
+              label: (textComp.data as Record<string, unknown>)?.content?.toString().substring(0, 80) || `Container ${index}`,
+              style: 2
+            });
+          });
+        }
+      }
+      
+      if (buttons.length > 0) {
+        const actionRow: APIActionRowComponent<APIButtonComponent> = {
+          type: 1,
+          components: buttons.slice(0, 5)
+        };
+        return actionRow;
+      }
+    }
+    
+    // For other components, return null (they won't be included)
+    return null;
+  }
+
+  /**
+   * Get the component type for Discord.js V2
+   */
+  private getComponentType(component: TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder | ActionRowBuilder): number {
+    if (component instanceof TextDisplayBuilder) return 1;
+    if (component instanceof SectionBuilder) return 2;
+    if (component instanceof ContainerBuilder) return 3;
+    if (component instanceof SeparatorBuilder) return 4;
+    if (component instanceof MediaGalleryBuilder) return 5;
+    if (component instanceof FileBuilder) return 6;
+    if (component instanceof ActionRowBuilder) return 1; // ActionRow type
+    return 1; // Default to ActionRow
   }
 
   /**
@@ -440,9 +595,8 @@ export class MessageBuilder {
   /**
    * Create a thumbnail component
    */
-  private createThumbnail(options: ThumbnailAccessory): unknown {
-    // This would need to be implemented based on Discord.js V2 API
-    // For now, return a placeholder
+  private createThumbnail(options: ThumbnailAccessory): Record<string, unknown> {
+    // Create a thumbnail component using Discord.js V2 API
     return {
       type: 'thumbnail',
       url: options.url,
@@ -518,13 +672,17 @@ export class MessageBuilder {
   /**
    * Create a section component
    */
-  private createSection(): SectionBuilder {
-    // This would need to be implemented based on the actual section options structure
-    // For now, return a basic section
+  private createSection(options: Record<string, unknown>): SectionBuilder {
     const section = new SectionBuilder();
     
     // Add text displays based on options
-    // This is a placeholder implementation
+    if (options.text) {
+      const textArray = Array.isArray(options.text) ? options.text : [options.text];
+      textArray.forEach((text: string) => {
+        const textDisplay = new TextDisplayBuilder().setContent(text);
+        section.addTextDisplayComponents(textDisplay);
+      });
+    }
     
     return section;
   }

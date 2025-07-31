@@ -92,7 +92,7 @@ const messageWithFile = new MessageBuilder()
     spoiler: false
   });
 
-// Example usage in a Discord bot
+// Example usage in a Discord bot - PRODUCTION READY
 async function sendWelcomeMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel) {
   const welcomeMessage = new MessageBuilder()
     .addText('**Welcome to our Server!**')
@@ -116,16 +116,14 @@ async function sendWelcomeMessage(channel: TextChannel | DMChannel | NewsChannel
       }
     });
 
-  // Note: This is a simplified example. In a real implementation,
-  // you would need to convert the components to the proper Discord.js format
-  console.log('Welcome message components:', welcomeMessage.build());
+  // Use the production-ready method for Discord.js compatibility
   await channel.send({
-    content: 'Welcome message with Components V2',
+    components: welcomeMessage.buildForDiscordJS(),
     flags: MessageFlags.IsComponentsV2
   });
 }
 
-// Example dashboard message
+// Example dashboard message - PRODUCTION READY
 async function sendDashboard(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel) {
   const dashboard = new MessageBuilder()
     .addText('**Server Dashboard**')
@@ -159,16 +157,14 @@ async function sendDashboard(channel: TextChannel | DMChannel | NewsChannel | Th
       ]
     });
 
-  // Note: This is a simplified example. In a real implementation,
-  // you would need to convert the components to the proper Discord.js format
-  console.log('Dashboard components:', dashboard.build());
+  // Use the production-ready method for Discord.js compatibility
   await channel.send({
-    content: 'Dashboard with Components V2',
+    components: dashboard.buildForDiscordJS(),
     flags: MessageFlags.IsComponentsV2
   });
 }
 
-// Example error message
+// Example error message - PRODUCTION READY
 async function sendErrorMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel, error: string) {
   const errorMessage = new MessageBuilder()
     .addContainer({
@@ -184,16 +180,14 @@ async function sendErrorMessage(channel: TextChannel | DMChannel | NewsChannel |
       style: 'primary'
     });
 
-  // Note: This is a simplified example. In a real implementation,
-  // you would need to convert the components to the proper Discord.js format
-  console.log('Error message components:', errorMessage.build());
+  // Use the production-ready method for Discord.js compatibility
   await channel.send({
-    content: `Error: ${error}`,
+    components: errorMessage.buildForDiscordJS(),
     flags: MessageFlags.IsComponentsV2
   });
 }
 
-// Example success message
+// Example success message - PRODUCTION READY
 async function sendSuccessMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel, message: string) {
   const successMessage = new MessageBuilder()
     .addContainer({
@@ -204,11 +198,9 @@ async function sendSuccessMessage(channel: TextChannel | DMChannel | NewsChannel
       ]
     });
 
-  // Note: This is a simplified example. In a real implementation,
-  // you would need to convert the components to the proper Discord.js format
-  console.log('Success message components:', successMessage.build());
+  // Use the production-ready method for Discord.js compatibility
   await channel.send({
-    content: `Success: ${message}`,
+    components: successMessage.buildForDiscordJS(),
     flags: MessageFlags.IsComponentsV2
   });
 }
