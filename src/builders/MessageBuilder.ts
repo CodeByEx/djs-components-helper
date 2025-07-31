@@ -369,6 +369,14 @@ export class MessageBuilder {
    * This is the recommended method for sending messages with components
    */
   buildForMessageSending(): APIMessageComponent[] {
+    return this.buildForTraditionalDiscordJS();
+  }
+
+  /**
+   * Build components for V2 message sending
+   * This method returns V2 components for use with MessageFlags.IsComponentsV2
+   */
+  buildForV2MessageSending(): (TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder | ActionRowBuilder)[] {
     return this.buildForDiscordJS();
   }
 
@@ -377,7 +385,7 @@ export class MessageBuilder {
    * This method returns an object that can be directly used with message.send() or message.edit()
    */
   buildMessagePayload(content?: string): { content?: string; components: APIMessageComponent[] } {
-    const components = this.buildForDiscordJS();
+    const components = this.buildForTraditionalDiscordJS();
     
     return {
       content: content || undefined,
@@ -387,9 +395,20 @@ export class MessageBuilder {
 
   /**
    * Build components in a format that works with Discord.js message sending
-   * This is the recommended method for production use
+   * This method returns V2 components directly for use with MessageFlags.IsComponentsV2
    */
-  buildForDiscordJS(): APIMessageComponent[] {
+  buildForDiscordJS(): (TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder | ActionRowBuilder)[] {
+    this.validate();
+    
+    // Return V2 components directly - they work with MessageFlags.IsComponentsV2
+    return this.components;
+  }
+
+  /**
+   * Build components for traditional Discord.js message sending (without V2)
+   * This converts V2 components to traditional buttons and action rows
+   */
+  buildForTraditionalDiscordJS(): APIMessageComponent[] {
     this.validate();
     
     const discordComponents: APIMessageComponent[] = [];
@@ -399,8 +418,8 @@ export class MessageBuilder {
         // ActionRowBuilder is already in the correct format
         discordComponents.push(component.toJSON() as APIActionRowComponent<APIButtonComponent>);
       } else {
-        // For V2 components, we need to wrap them in action rows
-        const convertedComponent = this.convertToDiscordJSFormat(component);
+        // For V2 components, we need to convert them to traditional components
+        const convertedComponent = this.convertToTraditionalFormat(component);
         if (convertedComponent) {
           discordComponents.push(convertedComponent);
         }
@@ -428,9 +447,10 @@ export class MessageBuilder {
   }
 
   /**
-   * Convert V2 components to Discord.js compatible format
+   * Convert V2 components to traditional Discord.js format
+   * This method properly handles V2 components by converting them to buttons
    */
-  private convertToDiscordJSFormat(component: TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder): APIMessageComponent | null {
+  private convertToTraditionalFormat(component: TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder): APIMessageComponent | null {
     // For V2 components, we need to convert them to traditional Discord.js components
     // Since V2 components aren't fully supported in message sending yet, we'll convert them to buttons
     

@@ -1,5 +1,5 @@
 import { MigrationUtils, ColorUtils } from '../src';
-import { MessageFlags } from 'discord.js';
+
 
 // Example: Converting a V1 embed to V2 container
 const v1Embed = {
@@ -153,32 +153,27 @@ const warningCard = MigrationUtils.createWarningCard({
 async function sendMigratedMessages(channel: any) {
   // Send welcome message
   await channel.send({
-    components: welcomeMessage.build(),
-    flags: MessageFlags.IsComponentsV2
+    components: welcomeMessage.buildForTraditionalDiscordJS()
   });
 
   // Send info card
   await channel.send({
-    components: infoCard.build(),
-    flags: MessageFlags.IsComponentsV2
+    components: infoCard.buildForTraditionalDiscordJS()
   });
 
   // Send error card
   await channel.send({
-    components: errorCard.build(),
-    flags: MessageFlags.IsComponentsV2
+    components: errorCard.buildForTraditionalDiscordJS()
   });
 
   // Send success card
   await channel.send({
-    components: successCard.build(),
-    flags: MessageFlags.IsComponentsV2
+    components: successCard.buildForTraditionalDiscordJS()
   });
 
   // Send warning card
   await channel.send({
-    components: warningCard.build(),
-    flags: MessageFlags.IsComponentsV2
+    components: warningCard.buildForTraditionalDiscordJS()
   });
 }
 

@@ -1,5 +1,5 @@
 import { MessageBuilder, ColorUtils } from '../src';
-import { MessageFlags, TextChannel, DMChannel, NewsChannel, ThreadChannel } from 'discord.js';
+import { TextChannel, DMChannel, NewsChannel, ThreadChannel } from 'discord.js';
 
 // Basic text message
 const basicText = new MessageBuilder()
@@ -116,10 +116,9 @@ async function sendWelcomeMessage(channel: TextChannel | DMChannel | NewsChannel
       }
     });
 
-  // Use the production-ready method for Discord.js compatibility
+  // Use traditional components for Discord.js compatibility
   await channel.send({
-    components: welcomeMessage.buildForDiscordJS(),
-    flags: MessageFlags.IsComponentsV2
+    components: welcomeMessage.buildForTraditionalDiscordJS()
   });
 }
 
@@ -157,10 +156,9 @@ async function sendDashboard(channel: TextChannel | DMChannel | NewsChannel | Th
       ]
     });
 
-  // Use the production-ready method for Discord.js compatibility
+  // Use traditional components for Discord.js compatibility
   await channel.send({
-    components: dashboard.buildForDiscordJS(),
-    flags: MessageFlags.IsComponentsV2
+    components: dashboard.buildForTraditionalDiscordJS()
   });
 }
 
@@ -180,10 +178,9 @@ async function sendErrorMessage(channel: TextChannel | DMChannel | NewsChannel |
       style: 'primary'
     });
 
-  // Use the production-ready method for Discord.js compatibility
+  // Use traditional components for Discord.js compatibility
   await channel.send({
-    components: errorMessage.buildForDiscordJS(),
-    flags: MessageFlags.IsComponentsV2
+    components: errorMessage.buildForTraditionalDiscordJS()
   });
 }
 
@@ -198,10 +195,9 @@ async function sendSuccessMessage(channel: TextChannel | DMChannel | NewsChannel
       ]
     });
 
-  // Use the production-ready method for Discord.js compatibility
+  // Use traditional components for Discord.js compatibility
   await channel.send({
-    components: successMessage.buildForDiscordJS(),
-    flags: MessageFlags.IsComponentsV2
+    components: successMessage.buildForTraditionalDiscordJS()
   });
 }
 

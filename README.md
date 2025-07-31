@@ -1,338 +1,189 @@
 # Discord.js Components V2 Helper
 
-A developer-friendly abstraction layer for Discord.js Components V2 that makes working with the new component system intuitive and enjoyable.
+A developer-friendly abstraction layer for Discord.js Components V2 that provides an intuitive API for creating rich, interactive messages.
 
-## Features
+## 🚀 Features
 
-- 🚀 **Full V2 Support**: Every feature of Discord's Components V2 including buttons, select menus, layouts, embeds-style cards, media galleries, containers, etc.
-- 🎨 **Color Utilities**: Built-in utilities for handling hex-to-Discord's internal color formats
-- 🔧 **Developer-friendly**: Clean, ergonomic APIs that drastically reduce boilerplate while staying flexible
-- 📦 **TypeScript-ready**: First-class type definitions for great DX in both JavaScript and TypeScript
-- 🔄 **Migration Tools**: Helpers to easily migrate from classic embeds and Components V1 into V2 equivalents
-- 📚 **Comprehensive Documentation**: Clear, example-driven docs with migration guides
+- **Simple API**: Easy-to-use builder pattern for creating V2 components
+- **Type Safety**: Full TypeScript support with comprehensive type definitions
+- **Flexible**: Support for both V2 components and traditional Discord.js components
+- **Validation**: Built-in validation to prevent common errors
+- **Migration Tools**: Utilities to help migrate from embeds to V2 components
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install djs-components-helper
 ```
 
-## Quick Start
+## 🔧 Quick Start
+
+### Basic Usage
 
 ```typescript
 import { MessageBuilder, ColorUtils } from 'djs-components-helper';
 import { MessageFlags } from 'discord.js';
 
-// Create a message with components
+// Create a simple message with V2 components
 const message = new MessageBuilder()
-  .addText('Hello, Discord!')
-  .addSeparator()
-  .addContainer({
-    accentColor: ColorUtils.hexToInt('#0099FF'),
-    children: [
-      { type: 'text', content: 'This is inside a container!' },
-      { type: 'button', customId: 'my-button', label: 'Click me!', style: 'primary' }
-    ]
-  });
+    .addContainer({
+        accentColor: ColorUtils.hexToInt('#5865F2'),
+        children: [
+            { type: 'text', content: '🤖 **Bot Status Dashboard**' },
+            { type: 'text', content: '────────────────────────────────' },
+            { type: 'text', content: '🟢 **Online** - All systems operational' }
+        ]
+    })
+    .addButton({
+        customId: 'refresh_status',
+        label: 'Refresh Status',
+        style: 'primary',
+        emoji: '🔄'
+    });
 
-// Send the message
+// Send with V2 components (RECOMMENDED)
 await channel.send({
-  components: message.build(),
-  flags: MessageFlags.IsComponentsV2
+    components: message.buildForV2MessageSending(),
+    flags: MessageFlags.IsComponentsV2
 });
-```
 
-## Core Concepts
-
-### MessageBuilder
-
-The main class for building complex messages with components:
-
-```typescript
-import { MessageBuilder } from 'djs-components-helper';
-
-const message = new MessageBuilder()
-  .addText('Welcome to our server!')
-  .addSeparator()
-  .addSection({
-    text: 'Choose your role:',
-    accessory: {
-      type: 'button',
-      customId: 'role-select',
-      label: 'Select Role',
-      style: 'primary'
-    }
-  });
-```
-
-### Color Utilities
-
-Convert hex colors to Discord's internal format:
-
-```typescript
-import { ColorUtils } from 'djs-components-helper';
-
-// Convert hex to Discord color
-const color = ColorUtils.hexToInt('#FF0000'); // Red
-const blue = ColorUtils.hexToInt('#0099FF');   // Discord Blue
-const green = ColorUtils.hexToInt('#57F287');  // Discord Green
-```
-
-### Component Types
-
-#### Text Display
-```typescript
-message.addText('Simple text content');
-message.addText('**Bold text** with *markdown*');
-```
-
-#### Sections
-```typescript
-message.addSection({
-  text: 'Section with button accessory',
-  accessory: {
-    type: 'button',
-    customId: 'section-button',
-    label: 'Click me!',
-    style: 'primary'
-  }
-});
-```
-
-#### Containers
-```typescript
-message.addContainer({
-  accentColor: ColorUtils.hexToInt('#FF0000'),
-  children: [
-    { type: 'text', content: 'Container content' },
-    { type: 'button', customId: 'container-btn', label: 'Button', style: 'secondary' }
-  ]
-});
-```
-
-#### Media Galleries
-```typescript
-message.addMediaGallery([
-  { url: 'attachment://image1.png', description: 'First image' },
-  { url: 'https://example.com/image2.jpg', description: 'Second image', spoiler: true }
-]);
-```
-
-#### Select Menus
-```typescript
-message.addSelectMenu({
-  customId: 'user-select',
-  placeholder: 'Select users',
-  type: 'user',
-  minValues: 1,
-  maxValues: 5
-});
-```
-
-## Migration from V1
-
-### From Embeds to Containers
-
-**Before (V1):**
-```typescript
-const embed = new EmbedBuilder()
-  .setTitle('My Embed')
-  .setDescription('Description')
-  .setColor('#FF0000');
-
-await channel.send({ embeds: [embed] });
-```
-
-**After (V2):**
-```typescript
-const message = new MessageBuilder()
-  .addContainer({
-    accentColor: ColorUtils.hexToInt('#FF0000'),
-    children: [
-      { type: 'text', content: '**My Embed**' },
-      { type: 'text', content: 'Description' }
-    ]
-  });
-
+// Or use traditional components as fallback
 await channel.send({
-  components: message.build(),
-  flags: MessageFlags.IsComponentsV2
+    components: message.buildForTraditionalDiscordJS()
 });
 ```
 
-### From Action Rows to Inline Components
-
-**Before (V1):**
-```typescript
-const row = new ActionRowBuilder()
-  .addComponents(
-    new ButtonBuilder()
-      .setCustomId('button1')
-      .setLabel('Button 1')
-      .setStyle(ButtonStyle.Primary)
-  );
-
-await channel.send({ components: [row] });
-```
-
-**After (V2):**
-```typescript
-const message = new MessageBuilder()
-  .addText('Message with inline button:')
-  .addButton({
-    customId: 'button1',
-    label: 'Button 1',
-    style: 'primary'
-  });
-
-await channel.send({
-  components: message.build(),
-  flags: MessageFlags.IsComponentsV2
-});
-```
-
-## API Reference
-
-### MessageBuilder
-
-#### Methods
-
-- `addText(content: string, options?: TextOptions): MessageBuilder`
-- `addSection(options: SectionOptions): MessageBuilder`
-- `addContainer(options: ContainerOptions): MessageBuilder`
-- `addSeparator(options?: SeparatorOptions): MessageBuilder`
-- `addMediaGallery(items: MediaItem[]): MessageBuilder`
-- `addFile(options: FileOptions): MessageBuilder`
-- `addButton(options: ButtonOptions): MessageBuilder`
-- `addSelectMenu(options: SelectMenuOptions): MessageBuilder`
-- `build(): Component[]`
-
-### ColorUtils
-
-#### Methods
-
-- `hexToInt(hex: string): number` - Convert hex color to Discord integer
-- `intToHex(int: number): string` - Convert Discord integer to hex
-- `isValidHex(hex: string): boolean` - Validate hex color format
-
-### Component Options
-
-#### TextOptions
-```typescript
-interface TextOptions {
-  id?: number;
-  allowedMentions?: AllowedMentions;
-}
-```
-
-#### SectionOptions
-```typescript
-interface SectionOptions {
-  text: string | string[];
-  accessory?: ButtonOptions | ThumbnailOptions;
-  id?: number;
-}
-```
-
-#### ContainerOptions
-```typescript
-interface ContainerOptions {
-  accentColor?: number;
-  children: ComponentConfig[];
-  spoiler?: boolean;
-  id?: number;
-}
-```
-
-## Examples
-
-### Complex Message with Multiple Components
-
-```typescript
-const message = new MessageBuilder()
-  .addText('**Welcome to our Community!**')
-  .addSeparator()
-  .addContainer({
-    accentColor: ColorUtils.hexToInt('#57F287'),
-    children: [
-      { type: 'text', content: '**Getting Started**' },
-      { type: 'text', content: 'Choose your role and explore our channels!' }
-    ]
-  })
-  .addSection({
-    text: 'Select your role:',
-    accessory: {
-      type: 'button',
-      customId: 'role-select',
-      label: 'Choose Role',
-      style: 'primary'
-    }
-  })
-  .addMediaGallery([
-    { url: 'attachment://welcome.png', description: 'Welcome banner' }
-  ]);
-
-await channel.send({
-  components: message.build(),
-  files: [new AttachmentBuilder('./assets/welcome.png')],
-  flags: MessageFlags.IsComponentsV2
-});
-```
-
-### Interactive Dashboard
+### Advanced Usage
 
 ```typescript
 const dashboard = new MessageBuilder()
-  .addText('**Server Dashboard**')
-  .addSeparator()
-  .addContainer({
-    accentColor: ColorUtils.hexToInt('#0099FF'),
-    children: [
-      { type: 'text', content: '**Statistics**' },
-      { type: 'text', content: 'Members: 1,234' },
-      { type: 'text', content: 'Online: 567' }
-    ]
-  })
-  .addSection({
-    text: 'Quick Actions:',
-    accessory: {
-      type: 'button',
-      customId: 'refresh-stats',
-      label: '🔄 Refresh',
-      style: 'secondary'
-    }
-  })
-  .addSelectMenu({
-    customId: 'admin-actions',
-    placeholder: 'Admin actions...',
-    type: 'string',
-    options: [
-      { label: 'Ban User', value: 'ban', description: 'Ban a user from the server' },
-      { label: 'Kick User', value: 'kick', description: 'Kick a user from the server' },
-      { label: 'Mute User', value: 'mute', description: 'Mute a user temporarily' }
-    ]
-  });
+    .addContainer({
+        accentColor: ColorUtils.hexToInt('#2ECC71'),
+        children: [
+            { type: 'text', content: '📊 **Performance Metrics**' },
+            { type: 'text', content: 'Real-time system monitoring' }
+        ]
+    })
+    .addSeparator()
+    .addSection({
+        text: [
+            '🖥️ **CPU Usage:** 45%',
+            '💾 **Memory:** 2.1GB / 8GB',
+            '🌐 **Network:** 150ms ping'
+        ],
+        accessory: {
+            type: 'button',
+            customId: 'view_details',
+            label: 'View Details',
+            style: 'secondary'
+        }
+    })
+    .addButton({
+        customId: 'export_report',
+        label: 'Export Report',
+        style: 'success',
+        emoji: '📊'
+    });
 
-await channel.send({
-  components: dashboard.build(),
-  flags: MessageFlags.IsComponentsV2
-});
+// Build for different use cases
+const v2Components = dashboard.buildForV2MessageSending();
+const traditionalComponents = dashboard.buildForTraditionalDiscordJS();
+const messagePayload = dashboard.buildMessagePayload('System Status Update');
 ```
 
-## Contributing
+## 🔧 API Reference
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### MessageBuilder
 
-## License
+The main builder class for creating V2 components.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+#### Methods
 
-## Support
+- `addText(content, options?)` - Add text display component
+- `addContainer(options)` - Add container with accent color and children
+- `addSection(options)` - Add section with text and optional accessory
+- `addSeparator(options?)` - Add visual separator
+- `addButton(options)` - Add interactive button
+- `addSelectMenu(options)` - Add select menu component
 
-- 📖 [Documentation](https://github.com/CodeByEx/djs-components-helper/wiki)
-- 🐛 [Report Issues](https://github.com/CodeByEx/djs-components-helper/issues)
-- 💬 [Discord Server](https://discord.gg/qk5NeCP6HP) 
+#### Build Methods
+
+- `buildForV2MessageSending()` - Returns V2 components for use with `MessageFlags.IsComponentsV2`
+- `buildForTraditionalDiscordJS()` - Converts V2 components to traditional Discord.js components
+- `buildMessagePayload(content?)` - Returns complete message payload with content and components
+
+### ColorUtils
+
+Utility functions for color conversion.
+
+- `hexToInt(hex)` - Convert hex color to integer
+- `intToHex(int)` - Convert integer to hex color
+
+## 🛠️ Migration from Embeds
+
+The package includes utilities to help migrate from traditional embeds to V2 components:
+
+```typescript
+import { MigrationUtils } from 'djs-components-helper';
+
+// Convert embed to V2 components
+const v2Components = MigrationUtils.embedToV2Components(embed);
+```
+
+## ⚠️ Important Notes
+
+### V2 Components vs Traditional Components
+
+This package supports both V2 components and traditional Discord.js components:
+
+1. **V2 Components** (Recommended): Use `buildForV2MessageSending()` with `MessageFlags.IsComponentsV2`
+2. **Traditional Components** (Fallback): Use `buildForTraditionalDiscordJS()` for compatibility
+
+### MessageFlags.IsComponentsV2
+
+The `MessageFlags.IsComponentsV2` flag is required for V2 components to display correctly. If this flag is not available in your Discord.js version, use the traditional component methods.
+
+## 🐛 Troubleshooting
+
+### "Cannot send an empty message" Error
+
+This error occurs when the package tries to convert V2 components incorrectly. Use the correct build method:
+
+```typescript
+// ❌ Wrong - causes empty message error
+const components = message.buildForDiscordJS();
+
+// ✅ Correct - use V2 components
+const components = message.buildForV2MessageSending();
+
+// ✅ Correct - use traditional components
+const components = message.buildForTraditionalDiscordJS();
+```
+
+### Type Errors
+
+If you encounter type errors, ensure you're using the correct method for your use case:
+
+```typescript
+// For V2 components
+const v2Components = message.buildForV2MessageSending();
+
+// For traditional Discord.js components
+const traditionalComponents = message.buildForTraditionalDiscordJS();
+```
+
+## 📝 Examples
+
+See the `examples/` directory for comprehensive usage examples:
+
+- `basic-usage.ts` - Basic component creation
+- `migration-examples.ts` - Migration from embeds
+- `fixed-bot-usage.ts` - Fixed bot implementation examples
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
