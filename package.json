@@ -1,0 +1,61 @@
+{
+  "name": "djs-components-helper",
+  "version": "1.0.0",
+  "description": "A developer-friendly abstraction layer for Discord.js Components V2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm test"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "components",
+    "v2",
+    "bot",
+    "helper",
+    "typescript",
+    "javascript"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CodeByEx/djs-components-v2-helper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CodeByEx/djs-components-v2-helper/issues"
+  },
+  "homepage": "https://github.com/CodeByEx/djs-components-v2-helper#readme",
+  "dependencies": {
+    "discord.js": "^14.19.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "discord.js": "^14.19.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
