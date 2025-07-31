@@ -83,7 +83,7 @@ export interface TextOptions {
 // Accessory types for sections
 export interface ButtonAccessory {
   type: 'button';
-  customId: string;
+  customId?: string; // Optional when URL is provided
   label: string;
   style: ButtonStyle | 'primary' | 'secondary' | 'success' | 'danger' | 'link';
   url?: string;
@@ -126,7 +126,7 @@ export interface SeparatorOptions {
 
 // Button options
 export interface ButtonOptions {
-  customId: string;
+  customId?: string; // Optional when URL is provided
   label: string;
   style: ButtonStyle | 'primary' | 'secondary' | 'success' | 'danger' | 'link';
   url?: string;

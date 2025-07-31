@@ -1,6 +1,6 @@
 {
   "name": "djs-components-helper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A developer-friendly abstraction layer for Discord.js Components V2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

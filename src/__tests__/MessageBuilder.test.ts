@@ -136,14 +136,26 @@ describe('MessageBuilder', () => {
       builder.addButton({
         customId: 'test-btn',
         label: 'Test Button',
-        style: 'success',
-        url: 'https://example.com',
-        emoji: '🎉',
-        disabled: true
+        style: 'primary',
+        emoji: '👍',
+        disabled: false
       });
       const components = builder.build();
       
       expect(components).toHaveLength(1);
+      expect(components[0]).toBeInstanceOf(require('discord.js').ActionRowBuilder);
+    });
+
+    it('should add button with URL', () => {
+      builder.addButton({
+        url: 'https://discord.js.org',
+        label: 'Visit Discord.js',
+        style: 'link'
+      });
+      const components = builder.build();
+      
+      expect(components).toHaveLength(1);
+      expect(components[0]).toBeInstanceOf(require('discord.js').ActionRowBuilder);
     });
   });
 
