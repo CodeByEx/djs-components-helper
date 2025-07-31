@@ -42,7 +42,7 @@ A comprehensive npm package that provides a developer-friendly abstraction layer
 ## Package Structure
 
 ```
-djs-components-v2-helper/
+djs-components-helper/
 ├── src/
 │   ├── builders/
 │   │   └── MessageBuilder.ts      # Main builder class
@@ -73,7 +73,7 @@ djs-components-v2-helper/
 The main class for building Discord Components V2 messages.
 
 ```typescript
-import { MessageBuilder, ColorUtils } from 'djs-components-v2-helper';
+import { MessageBuilder, ColorUtils } from 'djs-components-helper';
 
 const message = new MessageBuilder()
   .addText('Hello, Discord!')
@@ -92,7 +92,7 @@ const message = new MessageBuilder()
 Utility class for color conversions and operations.
 
 ```typescript
-import { ColorUtils } from 'djs-components-v2-helper';
+import { ColorUtils } from 'djs-components-helper';
 
 // Convert hex to Discord integer
 const color = ColorUtils.hexToInt('#FF0000'); // 16711680
@@ -111,7 +111,7 @@ const randomColor = ColorUtils.getRandomColor();
 Tools for migrating from V1 components to V2.
 
 ```typescript
-import { MigrationUtils } from 'djs-components-v2-helper';
+import { MigrationUtils } from 'djs-components-helper';
 
 // Convert V1 embed to V2 container
 const v2Message = MigrationUtils.embedToContainer({
@@ -268,7 +268,7 @@ npm run format             # Format code with Prettier
 ## Installation
 
 ```bash
-npm install djs-components-v2-helper
+npm install djs-components-helper
 ```
 
 ## Requirements
@@ -293,7 +293,7 @@ MIT License - see LICENSE file for details.
 ## Support
 
 - 📖 [Documentation](docs/API.md)
-- 🐛 [Report Issues](https://github.com/yourusername/djs-components-v2-helper/issues)
+- 🐛 [Report Issues](https://github.com/yourusername/djs-components-helper/issues)
 - 💬 [Discord Server](https://discord.gg/your-server)
 
 ## Conclusion

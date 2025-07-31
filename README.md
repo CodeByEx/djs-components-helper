@@ -14,13 +14,13 @@ A developer-friendly abstraction layer for Discord.js Components V2 that makes w
 ## Installation
 
 ```bash
-npm install djs-components-v2-helper
+npm install djs-components-helper
 ```
 
 ## Quick Start
 
 ```typescript
-import { MessageBuilder, ColorUtils } from 'djs-components-v2-helper';
+import { MessageBuilder, ColorUtils } from 'djs-components-helper';
 import { MessageFlags } from 'discord.js';
 
 // Create a message with components
@@ -49,7 +49,7 @@ await channel.send({
 The main class for building complex messages with components:
 
 ```typescript
-import { MessageBuilder } from 'djs-components-v2-helper';
+import { MessageBuilder } from 'djs-components-helper';
 
 const message = new MessageBuilder()
   .addText('Welcome to our server!')
@@ -70,7 +70,7 @@ const message = new MessageBuilder()
 Convert hex colors to Discord's internal format:
 
 ```typescript
-import { ColorUtils } from 'djs-components-v2-helper';
+import { ColorUtils } from 'djs-components-helper';
 
 // Convert hex to Discord color
 const color = ColorUtils.hexToInt('#FF0000'); // Red
@@ -333,6 +333,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- 📖 [Documentation](https://github.com/yourusername/djs-components-v2-helper/wiki)
-- 🐛 [Report Issues](https://github.com/yourusername/djs-components-v2-helper/issues)
-- 💬 [Discord Server](https://discord.gg/your-server) 
+- 📖 [Documentation](https://github.com/CodeByEx/djs-components-helper/wiki)
+- 🐛 [Report Issues](https://github.com/CodeByEx/djs-components-helper/issues)
+- 💬 [Discord Server](https://discord.gg/qk5NeCP6HP) 
