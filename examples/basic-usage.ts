@@ -1,5 +1,5 @@
 import { MessageBuilder, ColorUtils } from '../src';
-import { MessageFlags } from 'discord.js';
+import { MessageFlags, TextChannel, DMChannel, NewsChannel, ThreadChannel } from 'discord.js';
 
 // Basic text message
 const basicText = new MessageBuilder()
@@ -93,7 +93,7 @@ const messageWithFile = new MessageBuilder()
   });
 
 // Example usage in a Discord bot
-async function sendWelcomeMessage(channel: any) {
+async function sendWelcomeMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel) {
   const welcomeMessage = new MessageBuilder()
     .addText('**Welcome to our Server!**')
     .addSeparator()
@@ -116,14 +116,17 @@ async function sendWelcomeMessage(channel: any) {
       }
     });
 
+  // Note: This is a simplified example. In a real implementation,
+  // you would need to convert the components to the proper Discord.js format
+  console.log('Welcome message components:', welcomeMessage.build());
   await channel.send({
-    components: welcomeMessage.build(),
+    content: 'Welcome message with Components V2',
     flags: MessageFlags.IsComponentsV2
   });
 }
 
 // Example dashboard message
-async function sendDashboard(channel: any) {
+async function sendDashboard(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel) {
   const dashboard = new MessageBuilder()
     .addText('**Server Dashboard**')
     .addSeparator()
@@ -156,14 +159,17 @@ async function sendDashboard(channel: any) {
       ]
     });
 
+  // Note: This is a simplified example. In a real implementation,
+  // you would need to convert the components to the proper Discord.js format
+  console.log('Dashboard components:', dashboard.build());
   await channel.send({
-    components: dashboard.build(),
+    content: 'Dashboard with Components V2',
     flags: MessageFlags.IsComponentsV2
   });
 }
 
 // Example error message
-async function sendErrorMessage(channel: any, error: string) {
+async function sendErrorMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel, error: string) {
   const errorMessage = new MessageBuilder()
     .addContainer({
       accentColor: ColorUtils.hexToInt('#ED4245'),
@@ -178,14 +184,17 @@ async function sendErrorMessage(channel: any, error: string) {
       style: 'primary'
     });
 
+  // Note: This is a simplified example. In a real implementation,
+  // you would need to convert the components to the proper Discord.js format
+  console.log('Error message components:', errorMessage.build());
   await channel.send({
-    components: errorMessage.build(),
+    content: `Error: ${error}`,
     flags: MessageFlags.IsComponentsV2
   });
 }
 
 // Example success message
-async function sendSuccessMessage(channel: any, message: string) {
+async function sendSuccessMessage(channel: TextChannel | DMChannel | NewsChannel | ThreadChannel, message: string) {
   const successMessage = new MessageBuilder()
     .addContainer({
       accentColor: ColorUtils.hexToInt('#57F287'),
@@ -195,8 +204,11 @@ async function sendSuccessMessage(channel: any, message: string) {
       ]
     });
 
+  // Note: This is a simplified example. In a real implementation,
+  // you would need to convert the components to the proper Discord.js format
+  console.log('Success message components:', successMessage.build());
   await channel.send({
-    components: successMessage.build(),
+    content: `Success: ${message}`,
     flags: MessageFlags.IsComponentsV2
   });
 }

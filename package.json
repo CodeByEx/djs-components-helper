@@ -28,16 +28,16 @@
     "typescript",
     "javascript"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Edin | CodeByEx | zaplol@pm.me",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CodeByEx/djs-components-v2-helper.git"
+    "url": "https://github.com/CodeByEx/djs-components-helper"
   },
   "bugs": {
-    "url": "https://github.com/CodeByEx/djs-components-v2-helper/issues"
+    "url": "https://github.com/CodeByEx/djs-components-helper"
   },
-  "homepage": "https://github.com/CodeByEx/djs-components-v2-helper#readme",
+  "homepage": "https://github.com/CodeByEx/djs-components-helper#readme",
   "dependencies": {
     "discord.js": "^14.19.3"
   },
