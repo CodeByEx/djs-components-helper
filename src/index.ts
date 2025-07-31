@@ -36,7 +36,8 @@ export type {
   ButtonStyle,
   SeparatorSpacingSize,
   ComponentType,
-  APIAllowedMentions
+  APIAllowedMentions,
+  APIMessageComponent
 } from 'discord.js';
 
 // Default export for convenience

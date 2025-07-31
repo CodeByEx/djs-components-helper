@@ -365,6 +365,27 @@ export class MessageBuilder {
   }
 
   /**
+   * Build components for message sending with proper Discord.js compatibility
+   * This is the recommended method for sending messages with components
+   */
+  buildForMessageSending(): APIMessageComponent[] {
+    return this.buildForDiscordJS();
+  }
+
+  /**
+   * Build a complete message payload with components
+   * This method returns an object that can be directly used with message.send() or message.edit()
+   */
+  buildMessagePayload(content?: string): { content?: string; components: APIMessageComponent[] } {
+    const components = this.buildForDiscordJS();
+    
+    return {
+      content: content || undefined,
+      components
+    };
+  }
+
+  /**
    * Build components in a format that works with Discord.js message sending
    * This is the recommended method for production use
    */
@@ -375,15 +396,33 @@ export class MessageBuilder {
     
     this.components.forEach(component => {
       if (component instanceof ActionRowBuilder) {
+        // ActionRowBuilder is already in the correct format
         discordComponents.push(component.toJSON() as APIActionRowComponent<APIButtonComponent>);
       } else {
-        // Convert V2 components to Discord.js compatible format
+        // For V2 components, we need to wrap them in action rows
         const convertedComponent = this.convertToDiscordJSFormat(component);
         if (convertedComponent) {
           discordComponents.push(convertedComponent);
         }
       }
     });
+    
+    // If no components were converted, create a default button to prevent empty message
+    if (discordComponents.length === 0) {
+      const defaultButton: APIButtonComponent = {
+        type: 2,
+        custom_id: `default_${Date.now()}_${Math.random()}`,
+        label: 'Message Components',
+        style: 2
+      };
+      
+      const defaultActionRow: APIActionRowComponent<APIButtonComponent> = {
+        type: 1,
+        components: [defaultButton]
+      };
+      
+      discordComponents.push(defaultActionRow);
+    }
     
     return discordComponents;
   }
@@ -392,12 +431,16 @@ export class MessageBuilder {
    * Convert V2 components to Discord.js compatible format
    */
   private convertToDiscordJSFormat(component: TextDisplayBuilder | SectionBuilder | ContainerBuilder | SeparatorBuilder | MediaGalleryBuilder | FileBuilder): APIMessageComponent | null {
+    // For V2 components, we need to convert them to traditional Discord.js components
+    // Since V2 components aren't fully supported in message sending yet, we'll convert them to buttons
+    
     if (component instanceof TextDisplayBuilder) {
       // Convert text display to a button component
+      const content = component.data?.content || 'Text';
       const buttonComponent: APIButtonComponent = {
         type: 2, // Button type
-        custom_id: `text_${Date.now()}`,
-        label: component.data?.content?.substring(0, 80) || 'Text',
+        custom_id: `text_${Date.now()}_${Math.random()}`,
+        label: content.length > 80 ? content.substring(0, 77) + '...' : content,
         style: 2 // Secondary style
       };
       
@@ -413,16 +456,17 @@ export class MessageBuilder {
       // Convert section to action row with buttons
       const buttons: APIButtonComponent[] = [];
       
-      // Add section content as buttons - handle data access safely
+      // Extract text content from section
       const componentData = component.toJSON ? component.toJSON() : {};
       if (componentData && typeof componentData === 'object' && 'text_display_components' in componentData) {
         const textComponents = (componentData as Record<string, unknown>).text_display_components;
         if (Array.isArray(textComponents)) {
           textComponents.forEach((textComp: Record<string, unknown>, index: number) => {
+            const content = (textComp.data as Record<string, unknown>)?.content?.toString() || `Text ${index}`;
             buttons.push({
               type: 2,
-              custom_id: `section_text_${index}_${Date.now()}`,
-              label: (textComp.data as Record<string, unknown>)?.content?.toString().substring(0, 80) || `Text ${index}`,
+              custom_id: `section_text_${index}_${Date.now()}_${Math.random()}`,
+              label: content.length > 80 ? content.substring(0, 77) + '...' : content,
               style: 2
             });
           });
@@ -442,16 +486,17 @@ export class MessageBuilder {
       // Convert container to action row with buttons
       const buttons: APIButtonComponent[] = [];
       
-      // Handle data access safely
+      // Extract text content from container
       const componentData = component.toJSON ? component.toJSON() : {};
       if (componentData && typeof componentData === 'object' && 'text_display_components' in componentData) {
         const textComponents = (componentData as Record<string, unknown>).text_display_components;
         if (Array.isArray(textComponents)) {
           textComponents.forEach((textComp: Record<string, unknown>, index: number) => {
+            const content = (textComp.data as Record<string, unknown>)?.content?.toString() || `Container ${index}`;
             buttons.push({
               type: 2,
-              custom_id: `container_text_${index}_${Date.now()}`,
-              label: (textComp.data as Record<string, unknown>)?.content?.toString().substring(0, 80) || `Container ${index}`,
+              custom_id: `container_text_${index}_${Date.now()}_${Math.random()}`,
+              label: content.length > 80 ? content.substring(0, 77) + '...' : content,
               style: 2
             });
           });
@@ -467,8 +512,87 @@ export class MessageBuilder {
       }
     }
     
-    // For other components, return null (they won't be included)
-    return null;
+    if (component instanceof SeparatorBuilder) {
+      // Convert separator to a button with separator text
+      const buttonComponent: APIButtonComponent = {
+        type: 2,
+        custom_id: `separator_${Date.now()}_${Math.random()}`,
+        label: '─────────────',
+        style: 2,
+        disabled: true
+      };
+      
+      const actionRow: APIActionRowComponent<APIButtonComponent> = {
+        type: 1,
+        components: [buttonComponent]
+      };
+      
+      return actionRow;
+    }
+    
+    if (component instanceof MediaGalleryBuilder) {
+      // Convert media gallery to buttons
+      const buttons: APIButtonComponent[] = [];
+      
+      const componentData = component.toJSON ? component.toJSON() : {};
+      if (componentData && typeof componentData === 'object' && 'media_items' in componentData) {
+        const mediaItems = (componentData as Record<string, unknown>).media_items;
+        if (Array.isArray(mediaItems)) {
+          mediaItems.forEach((item: Record<string, unknown>, index: number) => {
+            const title = (item as Record<string, unknown>)?.title?.toString() || `Media ${index}`;
+            buttons.push({
+              type: 2,
+              custom_id: `media_${index}_${Date.now()}_${Math.random()}`,
+              label: title.length > 80 ? title.substring(0, 77) + '...' : title,
+              style: 2
+            });
+          });
+        }
+      }
+      
+      if (buttons.length > 0) {
+        const actionRow: APIActionRowComponent<APIButtonComponent> = {
+          type: 1,
+          components: buttons.slice(0, 5)
+        };
+        return actionRow;
+      }
+    }
+    
+    if (component instanceof FileBuilder) {
+      // Convert file to a button
+      const componentData = component.toJSON ? component.toJSON() : {};
+      const fileName = (componentData as Record<string, unknown>)?.file_name?.toString() || 'File';
+      
+      const buttonComponent: APIButtonComponent = {
+        type: 2,
+        custom_id: `file_${Date.now()}_${Math.random()}`,
+        label: fileName.length > 80 ? fileName.substring(0, 77) + '...' : fileName,
+        style: 2
+      };
+      
+      const actionRow: APIActionRowComponent<APIButtonComponent> = {
+        type: 1,
+        components: [buttonComponent]
+      };
+      
+      return actionRow;
+    }
+    
+    // For any other component type, create a fallback button
+    const fallbackButton: APIButtonComponent = {
+      type: 2,
+      custom_id: `fallback_${Date.now()}_${Math.random()}`,
+      label: 'Component',
+      style: 2
+    };
+    
+    const fallbackActionRow: APIActionRowComponent<APIButtonComponent> = {
+      type: 1,
+      components: [fallbackButton]
+    };
+    
+    return fallbackActionRow;
   }
 
   /**
